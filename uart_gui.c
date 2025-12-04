@@ -123,7 +123,7 @@ int16_t currSec = 0;
 
 //SAFE_1 to SAFE_4 are raw materials for menu design
 
-#define SAFE_0 	0
+
 #define SAFE_1 	0
 #define SAFE_2 	0
 #define SAFE_3 	0
@@ -132,11 +132,6 @@ int16_t currSec = 0;
 #define SAFE_6 	0
 #define SAFE_7 	0
 #define SAFE_8 	1
-
-#if SAFE_0
-	uint8_t myIndex = 0;
-	char tempString[100] = {0};
-#endif
 
 #define CLEAR_SCREEN() Cy_SCB_UART_PutString(USER_UART_HW, "\x1b[2J\x1b[;H");		//clear screen
 
@@ -288,112 +283,6 @@ int main(void)
 
     for(; ;)
     {
-		#if SAFE_0
-			if(!state)	//printing
-			{
-				if(stateInit == 0)	
-				{
-					if(loopCount == 0)
-					{
-						UART_GotoXY(10, 1);
-						Cy_SCB_UART_PutString(USER_UART_HW, "line # 10) Enter your first name: \r\n");
-						UART_GotoXY(10, 40);
-					}
-					else if(loopCount == 1)
-					{
-						UART_GotoXY(11, 1);
-						Cy_SCB_UART_PutString(USER_UART_HW, "line # 11) Enter your second name: \r\n");	//40th onwards
-						UART_GotoXY(11, 40);
-					}
-					else if(loopCount == 2)
-					{
-						UART_GotoXY(12, 1);
-						Cy_SCB_UART_PutString(USER_UART_HW, "line # 12) Enter your last name: \r\n");
-						UART_GotoXY(12, 40);
-					}
-					
-					stateInit = 1;
-					state = 1;
-				}
-			}
-			else if(state == 1)	//receiving
-			{	
-				#if 1
-					read_value = Cy_SCB_UART_Get(USER_UART_HW);
-					if(read_value != CY_SCB_UART_RX_NO_DATA)
-					{
-						if((char)read_value == ' ')
-						{
-							//Cy_SCB_UART_ClearRxFifo(USER_UART_HW);
-							//SCB_RX_FIFO_CTRL(USER_UART_HW) |= (uint32_t)  SCB_RX_FIFO_CTRL_CLEAR_Msk;
-							
-							reg = 1;
-							charReceived = myIndex;// - 1;
-						}
-						else if( ( (char)read_value == '\n') || ((char)read_value == '\r') )
-						{
-							state = 2;
-						}
-						else if( ( (char)read_value == 0x0A) || ((char)read_value == 0x0D) )
-						{
-							state = 2;
-						}
-						else if( (read_value == '\n') || (read_value == '\r') )
-						{
-							state = 2;
-						}
-						else if( (read_value == 0x0A) || (read_value == 0x0D) )
-						{
-							state = 2;
-						}
-						else 
-						{
-							tempString[myIndex++] = (char)read_value;
-						}
-						tempString_1[myIndex_1++] = (char)read_value;
-					}
-				#endif
-			}
-			else if(state == 2)	
-			{
-				uint8_t i = 0;
-				while(i < charReceived)
-				{
-					getString[i] = tempString[i];
-					i++;
-				}
-				state = 3;
-			}
-			else if(state == 3)	//received & echo-back
-			{
-				uint8_t j = 0;
-				while(j < charReceived)	
-				{
-					count = Cy_SCB_UART_Put(USER_UART_HW, getString[j++]);
-			        if(count == 0ul)
-			        {
-			          	handle_error();
-			        }
-				}
-				
-				state = 4;
-			}
-			else if(state == 4)	//reset state
-			{
-				myIndex 		= 0;
-				charReceived 	= 0;
-				stateInit 		= 0;
-				memset(getString, 0, sizeof(getString));
-
-				//Cy_SCB_UART_ClearRxFifo(USER_UART_HW);
-    			//SCB_RX_FIFO_CTRL(USER_UART_HW) &= (uint32_t) ~SCB_RX_FIFO_CTRL_CLEAR_Msk;
-
-				loopCount++;
-
-				state = 0;
-			}
-		#endif
-
 		#if SAFE_1
 			if(!state)	//printing
 			{
